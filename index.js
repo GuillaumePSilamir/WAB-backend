@@ -5,19 +5,16 @@ const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware CORS
 app.use(cors({
-  origin: 'https://wab-one.vercel.app', // 👈 autorise uniquement ton domaine Vercel
+  origin: 'https://wab-one.vercel.app',
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'x-api-key']
 }));
 
 app.use(bodyParser.json());
 
-// Exemple de données en mémoire (à remplacer plus tard par une BDD)
 let scores = [];
 
-// GET /scores
 app.get('/scores', (req, res) => {
   const apiKey = req.headers['x-api-key'];
   if (apiKey !== 'SilamirCD2025!') {
@@ -26,7 +23,6 @@ app.get('/scores', (req, res) => {
   res.json(scores);
 });
 
-// POST /submit-score
 app.post('/submit-score', (req, res) => {
   const apiKey = req.headers['x-api-key'];
   if (apiKey !== 'SilamirCD2025!') {
@@ -34,6 +30,15 @@ app.post('/submit-score', (req, res) => {
   }
 
   const { name, email, score, date } = req.body;
-
   if (!name || !email || score == null || !date) {
-    return res.status(400).json({ message:
+    return res.status(400).json({ message: 'Champs manquants' });
+  }
+
+  const newScore = { name, email, score, date, id: Date.now() };
+  scores.push(newScore);
+  res.json({ message: 'Score enregistré', score: newScore });
+});
+
+app.listen(PORT, () => {
+  console.log(`✅ Serveur lancé sur le port ${PORT}`);
+});

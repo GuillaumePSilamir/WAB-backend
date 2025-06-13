@@ -1,15 +1,13 @@
 {
   "name": "whac-backend",
   "version": "1.0.0",
-  "description": "Backend Express pour Whac-a-Bottleneck",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "pg": "^8.11.1"
+    "body-parser": "^1.20.2"
   }
 }
