@@ -6,11 +6,28 @@ const router = express.Router();
 // Middleware de sécurité : vérifie la clé API
 router.use((req, res, next) => {
   const apiKey = req.headers['x-api-key'];
+  
+  console.log('=== DEBUG API KEY ===');
+  console.log('API Key reçue:', `"${apiKey}"`);
+  console.log('API Key attendue:', `"${process.env.API_KEY}"`);
+  console.log('Égalité stricte:', apiKey === process.env.API_KEY);
+  console.log('Headers complets:', req.headers);
+  console.log('====================');
+  
   if (apiKey !== process.env.API_KEY) {
-    return res.status(403).json({ message: 'Clé API invalide' });
+    return res.status(403).json({ 
+      message: 'Clé API invalide',
+      debug: {
+        received: apiKey,
+        expected: process.env.API_KEY ? 'définie' : 'non définie'
+      }
+    });
   }
   next();
 });
+
+
+
 
 // Route GET pour récupérer les meilleurs scores
 router.get('/scores', async (req, res) => {
