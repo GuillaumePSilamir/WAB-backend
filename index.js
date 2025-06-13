@@ -4,17 +4,21 @@ import express from 'express';
 import cors from 'cors';
 import scoreRoutes from './routes/scores.js';
 
-
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ✅ Autorise le domaine Vercel à communiquer avec Railway
 app.use(cors({
-  origin: ['https://wab-one.vercel.app', 'http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1:5173'],
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'x-api-key'],
-  credentials: true
+  origin: [
+    'https://wab-one.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://localhost:5174' // <-- Ajoutez cette ligne !
+  ],
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'x-api-key'],
+  credentials: true
 }));
 
 // ✅ Pour lire les requêtes JSON
@@ -25,5 +29,5 @@ app.use('/', scoreRoutes);
 
 // ✅ Lancement du serveur
 app.listen(PORT, () => {
-  console.log(`✅ Serveur lancé sur le port ${PORT}`);
+  console.log(`✅ Serveur lancé sur le port ${PORT}`);
 });
