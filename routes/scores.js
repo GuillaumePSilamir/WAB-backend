@@ -1,8 +1,9 @@
-const express = require('express');
-const router = express.Router();
-const pool = require('../db');
+import express from 'express';
+import pool from '../db.js';
 
-// Middleware de sécurité
+const router = express.Router();
+
+// Middleware de sécurité : vérifie la clé API
 router.use((req, res, next) => {
   const apiKey = req.headers['x-api-key'];
   if (apiKey !== process.env.API_KEY) {
@@ -11,18 +12,21 @@ router.use((req, res, next) => {
   next();
 });
 
+// Route GET pour récupérer les meilleurs scores
 router.get('/scores', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM scores ORDER BY score DESC LIMIT 10');
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error('❌ Erreur GET /scores :', err);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 });
 
+// Route POST pour enregistrer un nouveau score
 router.post('/submit-score', async (req, res) => {
   const { name, email, score, date } = req.body;
+
   if (!name || !email || score == null || !date) {
     return res.status(400).json({ message: 'Champs manquants' });
   }
@@ -34,9 +38,9 @@ router.post('/submit-score', async (req, res) => {
     );
     res.json({ message: 'Score enregistré', score: result.rows[0] });
   } catch (err) {
-    console.error(err);
+    console.error('❌ Erreur POST /submit-score :', err);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 });
 
-module.exports = router;
+export default router;
