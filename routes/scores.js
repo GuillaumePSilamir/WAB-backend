@@ -1,32 +1,42 @@
-import express from 'express';
+const express = require('express');
 const router = express.Router();
+const pool = require('../db');
 
-const API_KEY = process.env.API_KEY;
-
-let scores = [];
-
-router.get('/scores', (req, res) => {
+// Middleware de sécurité
+router.use((req, res, next) => {
   const apiKey = req.headers['x-api-key'];
-  if (apiKey !== API_KEY) {
+  if (apiKey !== process.env.API_KEY) {
     return res.status(403).json({ message: 'Clé API invalide' });
   }
-  res.json(scores);
+  next();
 });
 
-router.post('/submit-score', (req, res) => {
-  const apiKey = req.headers['x-api-key'];
-  if (apiKey !== API_KEY) {
-    return res.status(403).json({ message: 'Clé API invalide' });
+router.get('/scores', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM scores ORDER BY score DESC LIMIT 10');
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur serveur' });
   }
+});
 
+router.post('/submit-score', async (req, res) => {
   const { name, email, score, date } = req.body;
   if (!name || !email || score == null || !date) {
     return res.status(400).json({ message: 'Champs manquants' });
   }
 
-  const newScore = { name, email, score, date, id: Date.now() };
-  scores.push(newScore);
-  res.json({ message: 'Score enregistré', score: newScore });
+  try {
+    const result = await pool.query(
+      'INSERT INTO scores (name, email, score, date) VALUES ($1, $2, $3, $4) RETURNING *',
+      [name, email, score, date]
+    );
+    res.json({ message: 'Score enregistré', score: result.rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
 });
 
-export default router;
+module.exports = router;
