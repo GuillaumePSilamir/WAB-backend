@@ -10,7 +10,8 @@ const PORT = process.env.PORT || 3000;
 // ✅ Autorise le domaine Vercel à communiquer avec Railway
 app.use(cors({
   origin: [
-    'https://wab-one.vercel.app',
+    'https://wab-one.vercel.app',                           // <== C'EST CELLE-CI QUI DOIT TOUJOURS ÊTRE LÀ !
+    'https://wab-kv1zm7dix-guillaumes-projects-f0ad4b84.vercel.app', // <== Celle-ci est pour les déploiements de prévisualisation si vous les utilisez
     'http://localhost:3000',
     'http://localhost:5173',
     'http://127.0.0.1:5173',
